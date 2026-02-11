@@ -7,9 +7,12 @@
 
 {% block body_block %}
 <h1>Rango says...</h1>
-This is the about page. <br />
-This tutorial has been put together by Zeynep. <br />
-<p>Visits: {{ visits }}</p>
-<a href="{% url 'rango:index' %}">Back to Index</a><br />
-<img src="{{ MEDIA_URL }}cat.jpg" alt="Picture of a cat" />
+<div>
+    here is the about page. <br />
+    This tutorial has been put together by Zeynep. <br />
+    <p>Visits: {{ visits }}</p>
+
+   <img src="{% static 'images/rango.jpg' %}" alt="Picture of Rango" />
+<img src="{{ MEDIA_URL }}cat.jpg" alt="Picture of a Cat" />
+</div>
 {% endblock %}

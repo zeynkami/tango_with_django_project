@@ -4,12 +4,16 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
+MEDIA_DIR = os.path.join(BASE_DIR, 'media')
+
 
 SECRET_KEY = 'o1estjmaa%uf6$r3frayxr4krxr60r$1=ctjbyd4yhkvuf7rpo'
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,6 +25,7 @@ INSTALLED_APPS = [
     'rango',
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -30,6 +35,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'tango_with_django_project.urls'
 
@@ -44,6 +50,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -88,10 +95,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    STATIC_DIR,
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = MEDIA_DIR
 
 LOGIN_URL = '/rango/login/'
