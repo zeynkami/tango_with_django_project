@@ -7,21 +7,17 @@
 
 {% block body_block %}
 <h1>Rango says...</h1>
-
 <div>
     hey there partner! <br />
+    <strong>{{ boldmessage }}</strong>
 </div>
-
-<a href="/rango/add_category/">Add a New Category</a><br />
 
 <div>
     <h2>Most Liked Categories</h2>
     {% if categories %}
         <ul>
         {% for category in categories %}
-            <li>
-                <a href="{% url 'rango:show_category' category.slug %}">{{ category.name }}</a>
-            </li>
+            <li><a href="{% url 'rango:show_category' category.slug %}">{{ category.name }}</a></li>
         {% endfor %}
         </ul>
     {% else %}
@@ -34,9 +30,7 @@
     {% if pages %}
         <ul>
         {% for page in pages %}
-            <li>
-                <a href="{{ page.url }}">{{ page.title }}</a>
-            </li>
+            <li><a href="{{ page.url }}">{{ page.title }}</a></li>
         {% endfor %}
         </ul>
     {% else %}

@@ -28,6 +28,7 @@ def index(request):
     response = render(request, 'rango/index.html', context=context_dict)
     return response
 
+
 def about(request):
     context_dict = {'visits': request.COOKIES.get('visits', '1')}
     return render(request, 'rango/about.html', context=context_dict)
@@ -38,12 +39,10 @@ def show_category(request, category_name_slug):
 
     try:
         category = Category.objects.get(slug=category_name_slug)
-
         pages = Page.objects.filter(category=category).order_by('-views')
 
         context_dict['pages'] = pages
         context_dict['category'] = category
-
     except Category.DoesNotExist:
         context_dict['category'] = None
         context_dict['pages'] = None
@@ -51,6 +50,7 @@ def show_category(request, category_name_slug):
     return render(request, 'rango/category.html', context=context_dict)
 
 
+@login_required
 def add_category(request):
     form = CategoryForm()
 
@@ -60,17 +60,16 @@ def add_category(request):
         if form.is_valid():
             form.save(commit=True)
             return redirect('/rango/')
-        else:
-            print(form.errors)
 
     return render(request, 'rango/add_category.html', {'form': form})
 
 
+@login_required
 def add_page(request, category_name_slug):
     try:
         category = Category.objects.get(slug=category_name_slug)
     except Category.DoesNotExist:
-        return redirect(reverse('rango:index'))
+        category = None
 
     form = PageForm()
 
@@ -85,7 +84,7 @@ def add_page(request, category_name_slug):
                 page.save()
 
                 return redirect(reverse('rango:show_category',
-                                kwargs={'category_name_slug': category_name_slug}))
+                                        kwargs={'category_name_slug': category_name_slug}))
         else:
             print(form.errors)
 
@@ -102,7 +101,6 @@ def register(request):
 
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save()
-
             user.set_password(user.password)
             user.save()
 
@@ -130,25 +128,22 @@ def register(request):
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '').strip()
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
         user = authenticate(username=username, password=password)
 
-        if user is not None and user.is_active:
-            login(request, user)
-            return redirect(reverse('rango:index'))
-
-        return render(request,
-                      'rango/login.html',
-                      {'error_message': 'Invalid login details supplied.'})
-
-    return render(request, 'rango/login.html')
-
-
-@login_required
-def restricted(request):
-    return render(request, 'rango/restricted.html')
+        if user:
+            if user.is_active:
+                login(request, user)
+                return redirect(reverse('rango:index'))
+            else:
+                return HttpResponse("Your Rango account is disabled.")
+        else:
+            print(f"Invalid login details: {username}, {password}")
+            return HttpResponse("Invalid login details supplied.")
+    else:
+        return render(request, 'rango/login.html')
 
 
 @login_required
@@ -157,9 +152,16 @@ def user_logout(request):
     return redirect(reverse('rango:index'))
 
 
+@login_required
+def restricted(request):
+    return HttpResponse("Since you're logged in, you can see this text!")
+
+
 def visitor_cookie_handler(request):
     visits = int(get_server_side_cookie(request, 'visits', '1'))
-    last_visit_cookie = get_server_side_cookie(request, 'last_visit',
+
+    last_visit_cookie = get_server_side_cookie(request,
+                                               'last_visit',
                                                str(datetime.now()))
     last_visit_time = datetime.strptime(last_visit_cookie[:-7],
                                         '%Y-%m-%d %H:%M:%S')
@@ -171,6 +173,7 @@ def visitor_cookie_handler(request):
         request.session['last_visit'] = last_visit_cookie
 
     request.session['visits'] = visits
+
 
 def get_server_side_cookie(request, cookie, default_val=None):
     val = request.session.get(cookie)
