@@ -22,13 +22,11 @@ def index(request):
 
     visitor_cookie_handler(request)
 
-  
+    context_dict['visits'] = request.session.get('visits', 1)
     context_dict['user'] = request.user
-
 
     response = render(request, 'rango/index.html', context=context_dict)
     return response
-
 
 def about(request):
     context_dict = {'visits': request.COOKIES.get('visits', '1')}
@@ -72,7 +70,7 @@ def add_page(request, category_name_slug):
     try:
         category = Category.objects.get(slug=category_name_slug)
     except Category.DoesNotExist:
-        category = None
+        return redirect(reverse('rango:index'))
 
     form = PageForm()
 
@@ -173,7 +171,6 @@ def visitor_cookie_handler(request):
         request.session['last_visit'] = last_visit_cookie
 
     request.session['visits'] = visits
-
 
 def get_server_side_cookie(request, cookie, default_val=None):
     val = request.session.get(cookie)
